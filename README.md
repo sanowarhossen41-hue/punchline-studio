@@ -22,7 +22,7 @@ View the original app in AI Studio: https://ai.studio/apps/97700a31-87f5-461b-9e
 
 
 
-**Prerequisite:** Node.js 18 or newer.
+**Prerequisite:** Node.js 20.19+ or 22.12+ (required by Vite 8).
 
 
 
@@ -53,8 +53,6 @@ View the original app in AI Studio: https://ai.studio/apps/97700a31-87f5-461b-9e
 
 
 The `GEMINI_API_KEY` must remain private. Do not commit real `.env` files or API keys. The repository ignores `.env*` except `.env.example`.
-
-
 
 
 
