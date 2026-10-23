@@ -1,0 +1,6 @@
+{
+  "name": "Punchline Studio",
+  "description": "AI-powered meme studio featuring Magic Captions and visual scene analysis with Gemini 4 Argon, plus custom meme image generation and editing with Gemini Nano Banana 2.1.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
