@@ -1,20 +1,20 @@
-<div align="center">
-
-<img width="1200" height="475" alt="Google AI Studio" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-
-</div>
-
-
-
 # Punchline Studio
 
 
 
-AI-powered meme studio featuring Magic Captions and visual scene analysis with Gemini, plus custom meme image generation and editing.
+AI-powered meme studio featuring Gemini-powered captions and visual scene analysis, plus custom meme image generation and editing.
 
 
 
-View the original app in AI Studio: https://ai.studio/apps/97700a31-87f5-461b-9e77-3e01d04c47ee
+**Google AI Studio project:** [Open Punchline Studio in AI Studio](https://ai.studio/apps/97700a31-87f5-461b-9e77-3e01d04c47ee). Open it while signed in to the Google account that owns the app. The GitHub repository and releases are the source distribution for this project.
+
+
+
+## Features
+
+
+
+The editor supports meme templates, captions, image filters, crop controls, and local saving. Gemini captions, image analysis, and image generation/editing are handled by the Express API server.
 
 
 
@@ -22,45 +22,20 @@ View the original app in AI Studio: https://ai.studio/apps/97700a31-87f5-461b-9e
 
 
 
-**Prerequisite:** Node.js 20.19+ or 22.12+ (required by Vite 8).
+Prerequisites: Node.js 20.19+ or 22.12+ (required by Vite 8). Install dependencies with `npm install`. Copy `.env.example` to `.env.local` and set your own `GEMINI_API_KEY`; never commit a real key or `.env.local`. Run `npm run dev` to start the Vite app and Express API server.
 
 
 
-1. Install dependencies:
-2. 
-   ```bash
-   
-   npm install
-   
-   ```
-   
-2. Create `.env.local` from `.env.example` and set your Gemini API key:
-3. 
-   ```bash
-   
-   cp .env.example .env.local
-   
-   ```
-   
-3. Start the development server:
-4. 
-   ```bash
-   
-   npm run dev
-   
-   ```
-   
-
-
-The `GEMINI_API_KEY` must remain private. Do not commit real `.env` files or API keys. The repository ignores `.env*` except `.env.example`.
+## Android APK
 
 
 
+The latest Android package is published in [GitHub Releases](https://github.com/sanowarhossen41-hue/punchline-studio/releases/latest). GitHub Actions creates an installable, debug-signed APK using Capacitor.
 
 
 
+**Important:** The APK currently bundles the app frontend only; it does not bundle the Express server or a Gemini API key. Meme editing and included templates are available, but Gemini generation and analysis actions require a separately hosted API backend and are not enabled in this APK yet. This is an installation/testing build, not a Play Store-signed production build.
 
 
 
-
-
+The Android package is built by `.github/workflows/android-apk.yml`. For a local build, run `npm run build`, install `@capacitor/core@8.5.3`, `@capacitor/cli@8.5.3`, and `@capacitor/android@8.5.3` with npm, run `npx cap add android` once, then `npx cap sync android` and `cd android && ./gradlew assembleDebug`.
