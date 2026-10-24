@@ -1,0 +1,300 @@
+name: Build Android APK
+
+
+
+on:
+
+  workflow_dispatch:
+  
+    inputs:
+    
+      release_tag:
+      
+        description: Existing or new release tag to attach the APK to
+        
+        required: true
+        
+        default: v1.0.1
+        
+        type: string
+        
+  push:
+  
+    tags:
+    
+      - 'v*'
+      
+
+
+permissions:
+
+  contents: write
+  
+
+
+jobs:
+
+  build-apk:
+  
+    name: Build and publish Android APK
+    
+    runs-on: ubuntu-latest
+    
+    env:
+    
+      RELEASE_TAG: ${{ github.event.inputs.release_tag || github.ref_name }}
+      
+    steps:
+    
+      - name: Check out source
+      
+        uses: actions/checkout@v4
+        
+
+
+      - name: Set up Node.js
+      
+        uses: actions/setup-node@v4
+        
+        with:
+        
+          node-version: 22
+          
+          cache: npm
+          
+
+
+      - name: Set up Java
+      
+        uses: actions/setup-java@v4
+        
+        with:
+        
+          distribution: temurin
+          
+          java-version: '21'
+          
+
+
+      - name: Set up Android SDK
+      
+        uses: android-actions/setup-android@v3
+        
+
+
+      - name: Install Android SDK packages
+      
+        run: |
+        
+          yes | sdkmanager --licenses >/dev/null
+          
+          sdkmanager "platform-tools" "platforms;android-36" "build-tools;36.0.0"
+          
+
+
+      - name: Install project dependencies
+      
+        run: npm ci
+        
+
+
+      - name: Build web app
+      
+        run: npm run build
+        
+
+
+      - name: Install Capacitor toolchain
+      
+        run: npm install --no-save --package-lock=false @capacitor/core@8.5.3 @capacitor/cli@8.5.3 @capacitor/android@8.5.3
+        
+
+
+      - name: Generate Android project and sync web assets
+      
+        run: |
+        
+          npx cap add android
+          
+          npx cap sync android
+          
+
+
+      - name: Set Android version and build APK
+      
+        run: |
+        
+          if [[ "$RELEASE_TAG" =~ ^v([0-9]+)\.([0-9]+)\.([0-9]+)$ ]]; then
+          
+            MAJOR="${BASH_REMATCH[1]}"
+            
+            MINOR="${BASH_REMATCH[2]}"
+            
+            PATCH="${BASH_REMATCH[3]}"
+            
+          else
+          
+            echo "Release tag must use vMAJOR.MINOR.PATCH format, got: $RELEASE_TAG" >&2
+            
+            exit 1
+            
+          fi
+          
+          VERSION="${RELEASE_TAG#v}"
+          
+          VERSION_CODE=$((MAJOR * 10000 + MINOR * 100 + PATCH))
+          
+          sed -i -E "s/versionCode [0-9]+/versionCode ${VERSION_CODE}/" android/app/build.gradle
+          
+          sed -i -E "s/versionName \"[^\"]+\"/versionName \"${VERSION}\"/" android/app/build.gradle
+          
+          chmod +x android/gradlew
+          
+          cd android
+          
+          ./gradlew --no-daemon assembleDebug
+          
+          cd ..
+          
+          mkdir -p release
+          
+          cp android/app/build/outputs/apk/debug/app-debug.apk "release/PunchlineStudio-${VERSION}-debug.apk"
+          
+
+
+      - name: Save APK as a workflow artifact
+      
+        uses: actions/upload-artifact@v4
+        
+        with:
+        
+          name: PunchlineStudio-Android-APK
+          
+          path: release/*.apk
+          
+          if-no-files-found: error
+          
+          retention-days: 30
+          
+
+
+      - name: Create or update GitHub release with APK
+      
+        uses: softprops/action-gh-release@v2
+        
+        with:
+        
+          tag_name: ${{ env.RELEASE_TAG }}
+          
+          name: Punchline Studio ${{ env.RELEASE_TAG }}
+          
+          body: |
+          
+            Android installable APK and source release for Punchline Studio.
+            
+
+
+            The attached APK is debug-signed and suitable for installation and testing.
+            
+
+
+            **AI feature note:** This APK bundles the app frontend only. The Gemini-powered actions call the Express API routes in `server.ts`; an Android build does not include that server or a Gemini API key. Until a secure backend URL is configured, the editor and bundled templates are available, but the AI generation/analysis actions will not work in this APK.
+            
+
+
+            The Google AI Studio project link requires the owning Google account. The GitHub repository is the source distribution for this project.
+            
+          files: release/*.apk
+          
+          fail_on_unmatched_files: true
+          
+          draft: false
+          
+          prerelease: false
+          
+          make_latest: true
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
